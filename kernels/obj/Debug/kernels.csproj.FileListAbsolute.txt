@@ -1,0 +1,12 @@
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.csproj.AssemblyReference.cache
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.csproj.SuggestedBindingRedirects.cache
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.Form1.resources
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.Properties.Resources.resources
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.csproj.GenerateResource.cache
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.csproj.CoreCompileInputs.cache
+D:\.MSA\CS389 image\.code\kernels\kernels\bin\Debug\kernels.exe.config
+D:\.MSA\CS389 image\.code\kernels\kernels\bin\Debug\kernels.exe
+D:\.MSA\CS389 image\.code\kernels\kernels\bin\Debug\kernels.pdb
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.exe
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.pdb
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.unsharp.resources

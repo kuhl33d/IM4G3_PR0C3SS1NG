@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kernels", "kernels\kernels.csproj", "{B496149A-D824-4653-867E-AC7460C858BD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B496149A-D824-4653-867E-AC7460C858BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B496149A-D824-4653-867E-AC7460C858BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B496149A-D824-4653-867E-AC7460C858BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B496149A-D824-4653-867E-AC7460C858BD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2EBAA529-2588-49FA-9096-52B4B2FF48C9}
+	EndGlobalSection
+EndGlobal
