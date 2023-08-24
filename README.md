@@ -1,5 +1,7 @@
 # IM4G3_PR0C3SS1NG
-the lost project for my best course
+new R3L34$3 !!!
+
+**custom masks added**
 ///sharpening///
 laplacian
 unsharp masking and highboost filtering (new form)
@@ -12,12 +14,14 @@ gaussian noise
 uniform noise
 
 ///transforming///
-_histogram equalization (new form)
+histogram equalization (new form)
 _historgram specification (new form)
-fourier transform (forward inverse) _(editor)
-_interpolation
+fourier transform (forward inverse) *(editor)
+interpolation
 
 todo:
 make a gui for forward and inverse fourier
-fix histogram gui
+    GPU needed !!! DFT matrices with FFT
 
+done:
+fixed histogram gui
