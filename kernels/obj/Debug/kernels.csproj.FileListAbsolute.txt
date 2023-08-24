@@ -10,3 +10,4 @@ D:\.MSA\CS389 image\.code\kernels\kernels\bin\Debug\kernels.pdb
 D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.exe
 D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.pdb
 D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.unsharp.resources
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.correlation.resources

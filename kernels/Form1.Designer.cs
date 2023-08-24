@@ -76,7 +76,8 @@
             "sobel_operators",
             "impulse_noise",
             "gaussian_noise",
-            "uniform_noise"});
+            "uniform_noise",
+            "custom"});
             this.listBox1.Location = new System.Drawing.Point(405, 203);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(138, 228);

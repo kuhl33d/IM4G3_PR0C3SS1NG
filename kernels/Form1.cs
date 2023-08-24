@@ -64,7 +64,8 @@ namespace kernels
             sobel_operators,
             impulse_noise,
             gaussian_noise,
-            uniform_noise
+            uniform_noise,
+            custom
         };
         StringFormat stringFormat = new StringFormat()
         {
@@ -211,6 +212,16 @@ namespace kernels
                     F2.ShowDialog();
                     filters.last = (int)F.highboost;
                     filters.last_size = (int)numericUpDown1.Value;
+                    this.Text = "highboost applied";
+                    break;
+                case ((int)F.custom):
+                    correlation F3 = new correlation(ref filters);
+                    F3.ShowDialog();
+                    filters.last = (int)F.custom;
+                    //this.Text = "applying highboost";
+                    //F2 = new unsharp(filters, false, (int)numericUpDown1.Value, (double)numericUpDown2.Value, (double)numericUpDown3.Value);
+                    //F2.ShowDialog();
+                    //filters.last_size = (int)numericUpDown1.Value;
                     this.Text = "highboost applied";
                     break;
             }
@@ -499,7 +510,7 @@ namespace kernels
                     }
                     if (old_pixel != pixel)
                     {
-                        if (filters.last == (int)F.median || filters.last == (int)F.averaging || filters.last == (int)F.gaussian || filters.last==(int)F.laplacian || filters.last==(int)F.robert || filters.last==(int)F.sobel_horizontal || filters.last == (int)F.sobel_vertical || filters.last == (int)F.sobel_operators)
+                        if (filters.last == (int)F.median || filters.last == (int)F.averaging || filters.last == (int)F.gaussian || filters.last==(int)F.laplacian || filters.last==(int)F.robert || filters.last==(int)F.sobel_horizontal || filters.last == (int)F.sobel_vertical || filters.last == (int)F.sobel_operators || filters.last == (int)F.custom)
                         {
                             kernel = filters.median_at(pixel.Y, pixel.X);
                             if (filters.last == (int)F.sobel_vertical)
@@ -522,10 +533,6 @@ namespace kernels
                             {
                                 d_kernel = null;
                             }
-                        }
-                        else
-                        {
-                            kernel = null;
                         }
                         old_pixel = pixel;
                     }
@@ -571,14 +578,31 @@ namespace kernels
                                         G.DrawString(string.Format("{0:.00}", d_kernel[i, j])+" * "+ kernel[i, j], font, new SolidBrush(c), rect2, stringFormat);
                                     }
                                 }
-                                RectangleF rect= new RectangleF(j * (ClientSize.Height / 4 / filters.last_size) + (ClientSize.Width / 2 - ClientSize.Height / 8), i * (ClientSize.Height / 4 / filters.last_size) + ClientSize.Height - (filters.last_size + 1) * (ClientSize.Height / 4 / filters.last_size), ClientSize.Height / 4 / filters.last_size, ClientSize.Height / 4 / filters.last_size);
-                                G.FillRectangle(new SolidBrush(Color.FromArgb(255, kernel[i, j], kernel[i, j], kernel[i, j])), j * (ClientSize.Height / 4 / filters.last_size) + (ClientSize.Width / 2 - ClientSize.Height / 8), i * (ClientSize.Height / 4 / filters.last_size)+ClientSize.Height-(filters.last_size+1)*(ClientSize.Height / 4 / filters.last_size), ClientSize.Height / 4 / filters.last_size, ClientSize.Height / 4 / filters.last_size);
-                                SizeF s = G.MeasureString(kernel[i,j]+"", this.Font);
-                                float fontScale = Math.Max(s.Width / rect.Width, s.Height / rect.Height);
-                                using (Font font = new Font(this.Font.FontFamily, this.Font.SizeInPoints / fontScale, GraphicsUnit.Point))
+                                if (filters.last == (int)F.custom)
                                 {
-                                    Color c = Color.FromArgb(255 - kernel[i, j], 255 - kernel[i, j], 255 - kernel[i, j]);
-                                    G.DrawString(kernel[i, j] + "", font, new SolidBrush(c), rect, stringFormat);
+                                    RectangleF rect = new RectangleF(j * (ClientSize.Height / 4 / filters.last_size) + (ClientSize.Width / 2 - ClientSize.Height / 8), i * (ClientSize.Height / 4 / filters.last_size) + ClientSize.Height - (filters.last_size + 1) * (ClientSize.Height / 4 / filters.last_size), ClientSize.Height / 4 / filters.last_size, ClientSize.Height / 4 / filters.last_size);
+                                    G.FillRectangle(new SolidBrush(Color.FromArgb(kernel[i,j], kernel[i, j], kernel[i, j])), j * (ClientSize.Height / 4 / filters.last_size) + (ClientSize.Width / 2 - ClientSize.Height / 8), i * (ClientSize.Height / 4 / filters.last_size) + ClientSize.Height - (filters.last_size + 1) * (ClientSize.Height / 4 / filters.last_size), ClientSize.Height / 4 / filters.last_size, ClientSize.Height / 4 / filters.last_size); SizeF s2 = G.MeasureString(filters.KK[i, j] + " * " + kernel[i, j], this.Font);
+                                    G.DrawRectangle(Pens.White, j * (ClientSize.Height / 4 / filters.last_size) + (ClientSize.Width / 2 - ClientSize.Height / 8), i * (ClientSize.Height / 4 / filters.last_size) + ClientSize.Height - (filters.last_size + 1) * (ClientSize.Height / 4 / filters.last_size), ClientSize.Height / 4 / filters.last_size, ClientSize.Height / 4 / filters.last_size); 
+                                    s2 = G.MeasureString(filters.KK[i, j] + " * " + kernel[i, j], this.Font);
+                                    float fontScale2 = Math.Max(s2.Width / rect.Width, s2.Height / rect.Height);
+                                    using (Font font = new Font(this.Font.FontFamily, this.Font.SizeInPoints / fontScale2, GraphicsUnit.Point))
+                                    {
+                                        Color c = Color.Blue;
+                                        G.DrawString(filters.KK[i, j] + " * " + kernel[i, j], font, new SolidBrush(c), rect, stringFormat);
+                                    }
+                                    
+                                }
+                                else
+                                {
+                                    RectangleF rect= new RectangleF(j * (ClientSize.Height / 4 / filters.last_size) + (ClientSize.Width / 2 - ClientSize.Height / 8), i * (ClientSize.Height / 4 / filters.last_size) + ClientSize.Height - (filters.last_size + 1) * (ClientSize.Height / 4 / filters.last_size), ClientSize.Height / 4 / filters.last_size, ClientSize.Height / 4 / filters.last_size);
+                                    G.FillRectangle(new SolidBrush(Color.FromArgb(255, kernel[i, j], kernel[i, j], kernel[i, j])), j * (ClientSize.Height / 4 / filters.last_size) + (ClientSize.Width / 2 - ClientSize.Height / 8), i * (ClientSize.Height / 4 / filters.last_size)+ClientSize.Height-(filters.last_size+1)*(ClientSize.Height / 4 / filters.last_size), ClientSize.Height / 4 / filters.last_size, ClientSize.Height / 4 / filters.last_size);
+                                    SizeF s = G.MeasureString(kernel[i,j]+"", this.Font);
+                                    float fontScale = Math.Max(s.Width / rect.Width, s.Height / rect.Height);
+                                    using (Font font = new Font(this.Font.FontFamily, this.Font.SizeInPoints / fontScale, GraphicsUnit.Point))
+                                    {
+                                        Color c = Color.FromArgb(255 - kernel[i, j], 255 - kernel[i, j], 255 - kernel[i, j]);
+                                        G.DrawString(kernel[i, j] + "", font, new SolidBrush(c), rect, stringFormat);
+                                    }
                                 }
                             }
                         }

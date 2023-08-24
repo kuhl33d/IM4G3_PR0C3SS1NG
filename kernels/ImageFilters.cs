@@ -21,18 +21,27 @@ namespace kernels
         public int last = -1;
         public int last_size = -1;
         public double last_sigma = -1;
+        public int[,] KK;
+        public int[] H;
+        public int[] H_NEW;
         public ImageFilters(Bitmap img)//gray scaling 
         {
             inp = new Bitmap(img);
             width = img.Width;
             height = img.Height;
             IMG = new int[inp.Height, inp.Width];
+            H = new int[256];
+            for (int i = 0; i < 256; i++)
+            {
+                H[i] = 0;
+            }
             for(int i=0;i<inp.Height; i++)
             {
                 for(int j = 0; j < inp.Width; j++)
                 {
                     Color pixel = inp.GetPixel(j,i);
                     int gray = (pixel.R + pixel.G + pixel.B) / 3;
+                    H[gray]++;
                     IMG[i,j] = gray;
                     inp.SetPixel(j,i,Color.FromArgb(255,gray,gray,gray));
                 }
@@ -513,7 +522,7 @@ namespace kernels
             double kernelSum = 0;
             int foff = (size - 1) / 2;
             double distance = 0;
-            double constant = 1d / (2 * Math.PI * sigma * sigma);
+            double constant = 1d / (2.0f * Math.PI * sigma * sigma);
             for (int y = -foff; y <= foff; y++)
             {
                 for (int x = -foff; x <= foff; x++)
@@ -595,7 +604,24 @@ namespace kernels
                             }
                         }
                     }
-                    ints.Sort();
+                    for(int x = 0; x < ints.Count; x++)
+                    {
+                        bool f = false;
+                        for(int y = 0; y < ints.Count - x - 1; y++)
+                        {
+                            if (ints[y] > ints[y + 1])
+                            {
+                                f = true;
+                                int t = ints[y];
+                                ints[y] = ints[y + 1];
+                                ints[y + 1] = t;
+                            }
+                        }
+                        if (f == false)
+                        {
+                            break;
+                        }
+                    }
                     int min = ints[0];
                     int max = ints[ints.Count - 1];
                     int med = ints[(int)(ints.Count / 2)];
@@ -632,6 +658,7 @@ namespace kernels
                     size = 3;
                 }
             }
+
         }
         public void adaptive_min(int s_max, int padding = 0)
         {
@@ -660,8 +687,14 @@ namespace kernels
                             }
                         }
                     }
-                    ints.Sort();
-                    int min = ints[0];
+                    int min = ints[1];
+                    for(int k = 1; k < ints.Count; k++)
+                    {
+                        if (ints[k]< min)
+                        {
+                            min = ints[k];
+                        }
+                    }
                     if (IMG[i, j] != min)
                     {
                         if(size != s_max)
@@ -702,8 +735,14 @@ namespace kernels
                             }
                         }
                     }
-                    ints.Sort();
-                    int max = ints[ints.Count-1];
+                    int max = ints[0];
+                    for(int k = 1; k < ints.Count; k++)
+                    {
+                        if (ints[k]> max)
+                        {
+                            max = ints[k];
+                        }
+                    }
                     if (IMG[i, j] != max)
                     {
                         if (size != s_max)
@@ -763,6 +802,117 @@ namespace kernels
                 }
             }
             return kernel;
+        }
+
+        public void conv(int[,] kernel,int size,int padding=0)
+        {
+            outp = new Bitmap(inp.Width, inp.Height);
+            IMG2 = new int[inp.Height, inp.Width];
+            int max = int.MinValue;
+            int min = int.MaxValue;
+            for (int i = 0; i < inp.Height; i++)
+            {
+                for (int j = 0; j < inp.Width; j++)
+                {
+                    int S = 0;
+                    for (int r = 0; r < size; r++)
+                    {
+                        for (int c = 0; c < size; c++)
+                        {
+                            if (i - (size / 2) + r < 0 || i - (size / 2) + r >= inp.Height || j - (size / 2) + c < 0 || j - (size / 2) + c >= inp.Width)
+                            {
+                                
+                            }
+                            else
+                            {
+                                S += kernel[r, c] * IMG[i - (size / 2) + r, j - (size / 2) + c];
+                            }
+                        }
+                    }
+                    if(S > max)
+                    {
+                        max = S;
+                    }
+                    if(S < min)
+                    {
+                        min = S;
+                    }
+                    IMG2[i, j] = S;
+                }
+            }
+            for (int i = 0; i < inp.Height; i++)
+            {
+                for (int j = 0; j < inp.Width; j++)
+                {
+                    IMG2[i, j] = 255 * (IMG2[i, j] - min) / (max - min);
+                    outp.SetPixel(j, i, Color.FromArgb(IMG2[i, j], IMG2[i, j], IMG2[i, j]));
+                }
+            }
+        }
+        public int[,] rotate_kernel_clock(int[,] kernel,int size)
+        {
+            int[,] new_k = new int[size, size];
+            for(int i = 0; i < size; i++)
+            {
+                for(int j=0;j< size; j++)
+                {
+                    new_k[j,size-1-i] = kernel[i,j];
+                }
+            }
+            return new_k;
+        }
+        public void histogram_equalization()
+        {
+            outp = new Bitmap(inp.Width, inp.Height);
+            IMG2 = new int[inp.Height, inp.Width];
+            float[] h_i_hat = new float[256];
+            int[] CDF = new int[256];
+            H_NEW = new int[256];
+            for(int i = 0; i < 256; i++)
+            {
+                h_i_hat[i] = (H[i] / (float)(inp.Width*inp.Height));
+                if(i != 0)
+                {
+                    CDF[i] = (int)Math.Round((CDF[i - 1] + h_i_hat[i])*255);
+                }
+                else
+                {
+                    CDF[i] = H[i];
+                }
+            }
+            for (int i = 0; i < inp.Height; i++)
+            {
+                for (int j = 0; j < inp.Width; j++)
+                {
+                    IMG2[i, j] = CDF[H[IMG[i, j]]];
+                    //IMG2[i, j] = (int)(ct / (size * size));
+                    outp.SetPixel(j, i, Color.FromArgb(255, IMG2[i, j], IMG2[i, j], IMG2[i, j]));
+                }
+            }
+        }
+        public Bitmap draw_hisotgram(int[] H)
+        {
+            Bitmap HIS = new Bitmap(width, height);
+            Graphics G = Graphics.FromImage(HIS);
+            int L = 16;
+            //int seg = width / 16;
+            G.Clear(Color.White);
+            int max = -1;
+            for (int i = 0; i < 256; i++)
+            {
+                if (H[i] > max)
+                    max = H[i];
+            }
+            for (int i = 0; i < 256 / L; i++)
+            {
+                for (int j = i * L; j < (i + 1) * L; j++)
+                {
+                    int x = j * (width / 256);
+                    int y = height - (H[j] * height) / max;
+                    G.FillRectangle(Brushes.Black, x, y, width / 256, (H[j] * height) / max);
+                }
+            }
+            return HIS;
         }
     }
     struct COMPLEX
@@ -1291,72 +1441,11 @@ namespace kernels
             return shiftedSpectrum;
         }
     }
-    class hist
+    class histogram
     {
-        public int x, y;
-        public int w, h;
-        public int l;
-        public int[] v;
-        StringFormat stringFormat = new StringFormat()
-        {
-            Alignment = StringAlignment.Center,
-            LineAlignment = StringAlignment.Center
-        };
-        public hist(int x, int y, int w, int h, int l)
-        {
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
-            this.l = l;
-            v = new int[l];
-            Random R = new Random();
-            for (int i = 0; i < l; i++)
-            {
-                v[i] = R.Next(0, 256);
-            }
-        }
-        public void draw(ref Bitmap img, ref Graphics G, Form1 F)
-        {
-            for (int i = 0; i < l; i++)
-            {
-                //v/255=x/height
-                RectangleF rect = new RectangleF(i * (w / l) + x, y + h - (v[i] * (h - 20)) / 255 - 20, w / l, (v[i] * (h - 20)) / 255);
-                G.DrawRectangle(Pens.Red, new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height));
-                SizeF s = G.MeasureString(v[i] + "", F.Font);
-                float fontScale;
-                if (rect.Height != 0 && rect.Width != 0)
-                {
-                    fontScale = Math.Max(s.Width / rect.Width, s.Height / rect.Height);
-                }
-                else
-                {
-                    fontScale = Math.Min(s.Width, s.Height);
-                }
-                using (Font font = new Font(F.Font.FontFamily, F.Font.SizeInPoints / fontScale, GraphicsUnit.Point))
-                {
-                    Color c = Color.White;
-                    G.DrawString(v[i] + "", font, new SolidBrush(c), rect, stringFormat);
-                }
-                Rectangle rect2 = new Rectangle(i * (w / l) + x, y + h - 20, w / l, 20);
-                G.DrawRectangle(Pens.Blue, new Rectangle((int)rect2.X, (int)rect2.Y, (int)rect2.Width, (int)rect2.Height));
-                SizeF s2 = G.MeasureString((int)(i * 255.0 / l) + "-" + (int)((i + 1) * (255.0 / l)), F.Font);
-                float fontScale2;
-                if (rect2.Height != 0 && rect2.Width != 0)
-                {
-                    fontScale2 = Math.Max(s2.Width / rect2.Width, s2.Height / rect2.Height);
-                }
-                else
-                {
-                    fontScale2 = Math.Min(s2.Width, s2.Height);
-                }
-                using (Font font = new Font(F.Font.FontFamily, F.Font.SizeInPoints / fontScale2, GraphicsUnit.Point))
-                {
-                    Color c = Color.White;
-                    G.DrawString((int)(i * 255.0 / l) + "-" + (int)((i + 1) * (255.0 / l)), font, new SolidBrush(c), rect2, stringFormat);
-                }
-            }
-
-        }
+        public Bitmap img;
+        public int width = 1000, height = 1000;
+        
+        
     }
 }

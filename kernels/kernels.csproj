@@ -48,11 +48,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="correlation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="correlation.Designer.cs">
+      <DependentUpon>correlation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="histogram_equalization.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="histogram_equalization.Designer.cs">
+      <DependentUpon>histogram_equalization.cs</DependentUpon>
     </Compile>
     <Compile Include="ImageFilters.cs" />
     <Compile Include="Program.cs" />
@@ -63,6 +75,9 @@
     <Compile Include="unsharp.Designer.cs">
       <DependentUpon>unsharp.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="correlation.resx">
+      <DependentUpon>correlation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
