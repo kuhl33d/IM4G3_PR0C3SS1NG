@@ -48,7 +48,7 @@ namespace kernels
         bool toggle_value = false;
         int[,] kernel;
         double[,] d_kernel;
-        enum F{
+        public enum F{
             median,
             adaptive_median,
             adaptive_min,
@@ -65,7 +65,10 @@ namespace kernels
             impulse_noise,
             gaussian_noise,
             uniform_noise,
-            custom
+            custom,
+            histogtam_equalization,
+            interpolation,
+            fourier_editor
         };
         StringFormat stringFormat = new StringFormat()
         {
@@ -215,14 +218,32 @@ namespace kernels
                     this.Text = "highboost applied";
                     break;
                 case ((int)F.custom):
+                    this.Text = "applying custom";
                     correlation F3 = new correlation(ref filters);
                     F3.ShowDialog();
                     filters.last = (int)F.custom;
-                    //this.Text = "applying highboost";
-                    //F2 = new unsharp(filters, false, (int)numericUpDown1.Value, (double)numericUpDown2.Value, (double)numericUpDown3.Value);
-                    //F2.ShowDialog();
-                    //filters.last_size = (int)numericUpDown1.Value;
-                    this.Text = "highboost applied";
+                    this.Text = "custom applied";
+                    break;
+                case ((int)F.histogtam_equalization):
+                    this.Text = "applying histogram equalization";
+                    histogram_equalization F4 = new histogram_equalization(ref filters);
+                    F4.ShowDialog();
+                    //filters.last = (int)F.histogtam_equalization;
+                    this.Text = "histogram equalization applied";
+                    break;
+                case ((int)F.interpolation):
+                    this.Text = "applying interpolation";
+                    interpolation F5 = new interpolation(ref filters);
+                    F5.ShowDialog();
+                    filters.last = (int)F.interpolation;
+                    this.Text = "interpolation applied";
+                    break;
+                case ((int)F.fourier_editor):
+                    this.Text = "applying fourier";
+                    fourier_editor F6 = new fourier_editor(ref filters);
+                    F6.ShowDialog();
+                    filters.last = (int)F.fourier_editor;
+                    this.Text = "fourier applied";
                     break;
             }
             old_pixel = new Point(-1, -1);

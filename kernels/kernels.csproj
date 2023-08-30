@@ -60,6 +60,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="fourier_editor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="fourier_editor.Designer.cs">
+      <DependentUpon>fourier_editor.cs</DependentUpon>
+    </Compile>
     <Compile Include="histogram_equalization.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,6 +73,12 @@
       <DependentUpon>histogram_equalization.cs</DependentUpon>
     </Compile>
     <Compile Include="ImageFilters.cs" />
+    <Compile Include="interpolation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="interpolation.Designer.cs">
+      <DependentUpon>interpolation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="unsharp.cs">
@@ -80,6 +92,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="histogram_equalization.resx">
+      <DependentUpon>histogram_equalization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="interpolation.resx">
+      <DependentUpon>interpolation.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

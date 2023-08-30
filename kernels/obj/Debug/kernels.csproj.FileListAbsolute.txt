@@ -1,5 +1,4 @@
 D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.csproj.AssemblyReference.cache
-D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.csproj.SuggestedBindingRedirects.cache
 D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.Form1.resources
 D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.Properties.Resources.resources
 D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.csproj.GenerateResource.cache
@@ -11,3 +10,5 @@ D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.exe
 D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.pdb
 D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.unsharp.resources
 D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.correlation.resources
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.histogram_equalization.resources
+D:\.MSA\CS389 image\.code\kernels\kernels\obj\Debug\kernels.interpolation.resources

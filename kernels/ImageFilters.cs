@@ -22,26 +22,18 @@ namespace kernels
         public int last_size = -1;
         public double last_sigma = -1;
         public int[,] KK;
-        public int[] H;
-        public int[] H_NEW;
         public ImageFilters(Bitmap img)//gray scaling 
         {
             inp = new Bitmap(img);
             width = img.Width;
             height = img.Height;
             IMG = new int[inp.Height, inp.Width];
-            H = new int[256];
-            for (int i = 0; i < 256; i++)
-            {
-                H[i] = 0;
-            }
             for(int i=0;i<inp.Height; i++)
             {
                 for(int j = 0; j < inp.Width; j++)
                 {
                     Color pixel = inp.GetPixel(j,i);
                     int gray = (pixel.R + pixel.G + pixel.B) / 3;
-                    H[gray]++;
                     IMG[i,j] = gray;
                     inp.SetPixel(j,i,Color.FromArgb(255,gray,gray,gray));
                 }
@@ -76,6 +68,28 @@ namespace kernels
                     {
                         outp.SetPixel(j, i, Color.Black);
                         IMG2[i, j] = 0;
+                    }
+                }
+            }
+        }
+        public void apply_thershold(int thres)
+        {
+            outp = new Bitmap(inp.Width, inp.Height);
+            IMG2 = new int[inp.Height, inp.Width];
+            for (int i = 0; i < inp.Height; i++)
+            {
+                for (int j = 0; j < inp.Width; j++)
+                {
+                    Color pixel = inp.GetPixel(j, i);
+                    if (pixel.R < thres)
+                    {
+                        outp.SetPixel(j, i, Color.Black);
+                        IMG2[i, j] = 0;
+                    }
+                    else
+                    {
+                        outp.SetPixel(j, i, Color.White);
+                        IMG2[i, j] = 255;
                     }
                 }
             }
@@ -861,43 +875,59 @@ namespace kernels
             }
             return new_k;
         }
-        public void histogram_equalization()
+        public void histogram_equalization(ref int []H,ref int[] H_NEW,ref Bitmap outp,ref int[,] IMG2)
         {
+            if(H == null)
+                return;
             outp = new Bitmap(inp.Width, inp.Height);
             IMG2 = new int[inp.Height, inp.Width];
             float[] h_i_hat = new float[256];
-            int[] CDF = new int[256];
+            float[] CDF = new float[256];
             H_NEW = new int[256];
             for(int i = 0; i < 256; i++)
             {
+                H_NEW[i] = 0;
                 h_i_hat[i] = (H[i] / (float)(inp.Width*inp.Height));
                 if(i != 0)
                 {
-                    CDF[i] = (int)Math.Round((CDF[i - 1] + h_i_hat[i])*255);
+                    CDF[i] = CDF[i - 1] + h_i_hat[i];
                 }
                 else
                 {
-                    CDF[i] = H[i];
+                    CDF[i] = h_i_hat[i];
                 }
             }
             for (int i = 0; i < inp.Height; i++)
             {
                 for (int j = 0; j < inp.Width; j++)
                 {
-                    IMG2[i, j] = CDF[H[IMG[i, j]]];
+                    int p = (int)(Math.Round(CDF[IMG[i, j]] * 255));
+                    H_NEW[p]++;
+                    IMG2[i, j] = p;
                     //IMG2[i, j] = (int)(ct / (size * size));
                     outp.SetPixel(j, i, Color.FromArgb(255, IMG2[i, j], IMG2[i, j], IMG2[i, j]));
                 }
             }
         }
-        public Bitmap draw_hisotgram(int[] H)
+        public Bitmap draw_hisotgram(Bitmap inp,ref int[] H)
         {
-            Bitmap HIS = new Bitmap(width, height);
+            Bitmap HIS = new Bitmap(1000, 1000);
             Graphics G = Graphics.FromImage(HIS);
             int L = 16;
             //int seg = width / 16;
             G.Clear(Color.White);
             int max = -1;
+            H = new int[256];
+            for (int i = 0; i < 256; H[i] = 0, i++) ;
+            for(int i=0;i< inp.Height; i++)
+            {
+                for(int j=0;j<inp.Width; j++)
+                {
+                    Color c = inp.GetPixel(j, i);
+                    int p = (c.R+c.G+c.B)/3;
+                    H[p]++;
+                }
+            }
             for (int i = 0; i < 256; i++)
             {
                 if (H[i] > max)
@@ -914,6 +944,64 @@ namespace kernels
             }
             return HIS;
         }
+
+        public Bitmap interpolation_nearest(Bitmap inp)
+        {
+            Bitmap outp = new Bitmap(inp.Width * 2, inp.Height * 2);
+            IMG2 = new int[inp.Height *2, inp.Width * 2];
+            for(int i=0,r=0;i< inp.Height; i++,r+=2)
+            {
+                for(int j = 0,c=0; j < inp.Width; j++,c+=2)
+                {
+                    Color C = inp.GetPixel(j, i);
+                    int p = (C.R + C.G + C.B) / 3;
+                    IMG2[r, c] = p;
+                    IMG2[r, c+1] = p;
+                    IMG2[r+1, c] = p;
+                    IMG2[r+1, c + 1] = p;
+                    outp.SetPixel(c,r,Color.FromArgb(p,p,p));
+                    outp.SetPixel(c+1, r, Color.FromArgb(p, p, p));
+                    outp.SetPixel(c, r+1, Color.FromArgb(p, p, p));
+                    outp.SetPixel(c + 1, r+1, Color.FromArgb(p, p, p));
+                }
+            }
+            return outp;
+        }
+        public Bitmap interpolation_bilinear(Bitmap inp)
+        {
+            Bitmap outp = new Bitmap(inp.Width * 2, inp.Height * 2);
+
+            for (int r = 0; r < outp.Height; r++)
+            {
+                for (int c = 0; c < outp.Width; c++)
+                {
+                    float origX = c / 2.0f;
+                    float origY = r / 2.0f;
+
+                    int x1 = (int)Math.Floor(origX);
+                    int x2 = Math.Min(x1 + 1, inp.Width - 1);
+                    int y1 = (int)Math.Floor(origY);
+                    int y2 = Math.Min(y1 + 1, inp.Height - 1);
+
+                    Color C1 = inp.GetPixel(x1, y1);
+                    Color C2 = inp.GetPixel(x2, y1);
+                    Color C3 = inp.GetPixel(x1, y2);
+                    Color C4 = inp.GetPixel(x2, y2);
+
+                    float alpha = origX - x1;
+                    float beta = origY - y1;
+
+                    int R = (int)((1 - alpha) * (1 - beta) * C1.R + alpha * (1 - beta) * C2.R + (1 - alpha) * beta * C3.R + alpha * beta * C4.R);
+                    int G = (int)((1 - alpha) * (1 - beta) * C1.G + alpha * (1 - beta) * C2.G + (1 - alpha) * beta * C3.G + alpha * beta * C4.G);
+                    int B = (int)((1 - alpha) * (1 - beta) * C1.B + alpha * (1 - beta) * C2.B + (1 - alpha) * beta * C3.B + alpha * beta * C4.B);
+
+                    outp.SetPixel(c, r, Color.FromArgb(R, G, B));
+                }
+            }
+
+            return outp;
+        }
+
     }
     struct COMPLEX
     {
@@ -1235,7 +1323,7 @@ namespace kernels
             }
             Fourier = FFTShifted;
         }
-        public void FFTPlot(COMPLEX[,] Output, double cons = 1.0f)
+        public Bitmap FFTPlot(COMPLEX[,] Output, double cons = 1.0f)
         {
             int i, j;
             FFTLog = new double[nx, ny];
@@ -1280,7 +1368,7 @@ namespace kernels
                 }
             }
 
-            FourierPlot = Displayimage(FFTNormalized);
+            return Displayimage(FFTNormalized);
         }
         public void InverseFFT()
         {
@@ -1440,12 +1528,5 @@ namespace kernels
 
             return shiftedSpectrum;
         }
-    }
-    class histogram
-    {
-        public Bitmap img;
-        public int width = 1000, height = 1000;
-        
-        
     }
 }
